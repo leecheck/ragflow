@@ -14,6 +14,7 @@ import userService, {
   deleteTenantUser,
   listTenant,
   listTenantUser,
+  treeOrgUser,
 } from '@/services/user-service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Modal, message } from 'antd';
@@ -35,7 +36,7 @@ export const useFetchUserInfo = (): ResponseGetType<IUserInfo> => {
       if (data.code === 0) {
         i18n.changeLanguage(
           LanguageTranslationMap[
-            data.data.language as keyof typeof LanguageTranslationMap
+          data.data.language as keyof typeof LanguageTranslationMap
           ],
         );
       }
@@ -269,6 +270,25 @@ export const useListTenantUser = () => {
     queryFn: async () => {
       const { data } = await listTenantUser(tenantId);
 
+      return data?.data ?? [];
+    },
+  });
+
+  return { data, loading, refetch };
+};
+
+export const useOrgUsers = () => {
+  const {
+    data,
+    isFetching: loading,
+    refetch,
+  } = useQuery<ITenantUser[]>({
+    queryKey: ['OrgUsers'],
+    initialData: [],
+    gcTime: 0,
+    enabled: true,
+    queryFn: async () => {
+      const { data } = await treeOrgUser();
       return data?.data ?? [];
     },
   });

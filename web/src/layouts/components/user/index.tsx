@@ -4,6 +4,7 @@ import React from 'react';
 import { history } from 'umi';
 
 import styles from '../../index.less';
+import { UserOutlined } from '@ant-design/icons';
 
 const App: React.FC = () => {
   const { data: userInfo } = useFetchUserInfo();
@@ -13,15 +14,17 @@ const App: React.FC = () => {
   };
 
   return (
-    <Avatar
+
+    userInfo.avatar ? <Avatar
       size={32}
       onClick={toSetting}
       className={styles.clickAvailable}
       src={
-        userInfo.avatar ??
-        'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+        userInfo.avatar
       }
-    />
+    /> : <Avatar style={{ backgroundColor: '#727272' }}
+      className={styles.clickAvailable}
+      onClick={toSetting} icon={<UserOutlined />} />
   );
 };
 

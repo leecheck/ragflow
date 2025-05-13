@@ -108,6 +108,8 @@ const userService = registerServer<keyof typeof methods>(methods, request);
 export const listTenantUser = (tenantId: string) =>
   request.get(api.listTenantUser(tenantId));
 
+export const treeOrgUser = () => request.get(api.treeOrgUser);
+
 export const addTenantUser = (tenantId: string, email: string) =>
   post(api.addTenantUser(tenantId), { email });
 

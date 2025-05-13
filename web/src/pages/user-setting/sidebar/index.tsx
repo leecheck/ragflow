@@ -2,7 +2,7 @@ import { Domain } from '@/constants/common';
 import { useTranslate } from '@/hooks/common-hooks';
 import { useLogout } from '@/hooks/login-hooks';
 import { useSecondPathName } from '@/hooks/route-hook';
-import { useFetchSystemVersion } from '@/hooks/user-setting-hooks';
+import { useFetchSystemVersion, useFetchUserInfo } from '@/hooks/user-setting-hooks';
 import type { MenuProps } from 'antd';
 import { Flex, Menu } from 'antd';
 import React, { useEffect, useMemo } from 'react';
@@ -23,12 +23,15 @@ const SideBar = () => {
   const { t } = useTranslate('setting');
   const { version, fetchSystemVersion } = useFetchSystemVersion();
 
+  const { data: userInfo } = useFetchUserInfo();
+  const superMenus = [UserSettingRouteKey.Model, UserSettingRouteKey.System, UserSettingRouteKey.Api, UserSettingRouteKey.Password]
+
   useEffect(() => {
     if (location.host !== Domain) {
       fetchSystemVersion();
     }
   }, [fetchSystemVersion]);
-
+  UserSettingRouteKey
   function getItem(
     label: string,
     key: React.Key,
@@ -36,25 +39,45 @@ const SideBar = () => {
     children?: MenuItem[],
     type?: 'group',
   ): MenuItem {
-    return {
-      key,
-      icon,
-      children,
-      label: (
-        <Flex justify={'space-between'}>
-          {t(label)}
-          <span className={styles.version}>
-            {label === 'system' && version}
-          </span>
-        </Flex>
-      ),
-      type,
-    } as MenuItem;
+    if (userInfo.email == "superuser") {
+      return {
+        key,
+        icon,
+        children,
+        label: (
+          <Flex justify={'space-between'}>
+            {t(label)}
+            <span className={styles.version}>
+              {label === 'system' && version}
+            </span>
+          </Flex>
+        ),
+        type,
+      } as MenuItem;
+    } else {
+      if (!superMenus.includes(key)) {
+        return {
+          key,
+          icon,
+          children,
+          label: (
+            <Flex justify={'space-between'}>
+              {t(label)}
+              <span className={styles.version}>
+                {label === 'system' && version}
+              </span>
+            </Flex>
+          ),
+          type,
+        } as MenuItem;
+      }
+    }
+
   }
 
   const items: MenuItem[] = Object.values(UserSettingRouteKey).map((value) =>
     getItem(value, value, UserSettingIconMap[value]),
-  );
+  ).filter(item => item);
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
     if (key === UserSettingRouteKey.Logout) {

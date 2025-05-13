@@ -118,6 +118,16 @@ request.interceptors.response.use(async (response: Response, options) => {
     });
     authorizationUtil.removeAll();
     redirectToLogin();
+  } else if (data?.code === 109) {
+    if (window.location.href.includes('sso')) {
+      
+    } else {
+      notification.error({
+        message: `${i18n.t('message.hint')} : ${data?.code}`,
+        description: data?.message,
+        duration: 3,
+      });
+    }
   } else if (data?.code !== 0) {
     notification.error({
       message: `${i18n.t('message.hint')} : ${data?.code}`,
