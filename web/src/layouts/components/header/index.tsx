@@ -29,7 +29,7 @@ const RagHeader = () => {
       { path: '/knowledge', name: t('knowledgeBase'), icon: KnowledgeBaseIcon },
       { path: '/chat', name: t('chat'), icon: MessageOutlined },
       { path: '/search', name: t('search'), icon: SearchOutlined },
-      { path: '/flow', name: t('flow'), icon: GraphIcon },
+      // { path: '/flow', name: t('flow'), icon: GraphIcon },
       { path: '/file', name: t('fileManager'), icon: FileIcon },
     ],
     [t],
@@ -71,8 +71,8 @@ const RagHeader = () => {
           onClick={handleLogoClick}
           className={styles.logoWrapper}
         >
-          <img src="/logo.svg" alt="" className={styles.appIcon} />
-          <span className={styles.appName}>{appConf.appName}</span>
+          <img src="/favicon.ico" alt="" className={styles.appIcon} />
+          <span className={styles.appName}>{window.global.appName}</span>
         </Space>
       </a>
       <Space size={[0, 8]} wrap>

@@ -1,6 +1,29 @@
+import { useListTenantUser, useOrgUsers } from '@/hooks/user-setting-hooks';
 import { IModalProps } from '@/interfaces/common';
-import { Form, Input, Modal } from 'antd';
+import { Col, Form, Input, message, Modal, Row, Tag, Tree } from 'antd';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+function disableNodesByKey(treeData, keys) {
+  const keySet = new Set(keys);
+
+  function traverse(node) {
+    // 如果当前节点需要禁用
+    if (keySet.has(node.email)) {
+      node.disabled = true;
+    }
+
+    // 递归处理子节点（如果存在）
+    if (node.children?.length) {
+      node.children.forEach(child => traverse(child));
+    }
+  }
+
+  // 克隆数据并遍历修改
+  const clonedTree = _.cloneDeep(treeData);
+  clonedTree.forEach(rootNode => traverse(rootNode));
+  return clonedTree;
+}
 
 const AddingUserModal = ({
   visible,
@@ -8,17 +31,34 @@ const AddingUserModal = ({
   loading,
   onOk,
 }: IModalProps<string>) => {
-  const [form] = Form.useForm();
   const { t } = useTranslation();
 
-  type FieldType = {
-    email?: string;
+
+  const { data } = useListTenantUser();
+
+  const { data: userOrg } = useOrgUsers()
+
+  const treeData = useMemo(() => {
+    const emails = data.map(item => item.email)
+    //return userOrg
+    return disableNodesByKey(userOrg, emails)
+  }, [data, userOrg])
+
+
+  const [checkedNodes, setCheckedNodes] = useState([])
+
+  const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
+    const checkedNodes = info.checkedNodes
+    setCheckedNodes(checkedNodes)
+    console.log('onCheck', checkedKeys, info);
   };
 
   const handleOk = async () => {
-    const ret = await form.validateFields();
+    if (!checkedNodes.length) {
+      return message.error("未添加新的团队成员")
+    }
 
-    return onOk?.(ret.email);
+    return onOk?.(checkedNodes.filter(item => item.type == "user"));
   };
 
   return (
@@ -30,21 +70,25 @@ const AddingUserModal = ({
       okButtonProps={{ loading }}
       confirmLoading={loading}
     >
-      <Form
-        name="basic"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
-        autoComplete="off"
-        form={form}
-      >
-        <Form.Item<FieldType>
-          label={t('setting.email')}
-          name="email"
-          rules={[{ required: true }]}
-        >
-          <Input />
-        </Form.Item>
-      </Form>
+      <Row>
+        <Col span={12}>
+          <Tree
+            defaultExpandedKeys={["org-1"]}
+            height={600}
+            checkable
+            selectable={false}
+            onCheck={onCheck}
+            treeData={treeData}
+          />
+        </Col>
+        <Col offset={1} span={11}>
+          {
+            checkedNodes.filter(item => item.type == "user").map((item) => {
+              return <Row key={item.key}><Tag>{item.title}</Tag></Row>
+            })
+          }
+        </Col>
+      </Row>
     </Modal>
   );
 };

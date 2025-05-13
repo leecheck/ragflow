@@ -7,6 +7,7 @@ import routes from './src/routes';
 export default defineConfig({
   title: appName,
   outputPath: 'dist',
+
   alias: { '@parent': path.resolve(__dirname, '../') },
   npmClient: 'npm',
   base: '/',
@@ -15,7 +16,7 @@ export default defineConfig({
   esbuildMinifyIIFE: true,
   icons: {},
   hash: true,
-  favicons: ['/logo.svg'],
+  favicons: ['/favicon.ico'],
   clickToComponent: {},
   history: {
     type: 'browser',
@@ -54,4 +55,5 @@ export default defineConfig({
     return memo;
   },
   tailwindcss: {},
+  headScripts: [`/config/config.js`]
 });

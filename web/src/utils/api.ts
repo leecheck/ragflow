@@ -1,4 +1,4 @@
-let api_host = `/v1`;
+let api_host = window.global.baseUrl;
 
 export { api_host };
 
@@ -11,6 +11,7 @@ export default {
   user_info: `${api_host}/user/info`,
   tenant_info: `${api_host}/user/tenant_info`,
   set_tenant_info: `${api_host}/user/set_tenant_info`,
+  treeOrgUser: `${api_host}/user/query_users_tree`,
 
   // team
   addTenantUser: (tenantId: string) => `${api_host}/tenant/${tenantId}/user`,
