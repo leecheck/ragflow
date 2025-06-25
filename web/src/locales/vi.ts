@@ -106,7 +106,8 @@ export default {
       disabled: 'Tắt',
       action: 'Hành động',
       parsingStatus: 'Trạng thái phân tích cú pháp',
-      parsingStatusTip: 'Thời gian xử lý tài liệu thay đổi tùy theo nhiều yếu tố. Bật các tính năng như Knowledge Graph, RAPTOR, Trích xuất Câu hỏi Tự động hoặc Trích xuất Từ khóa Tự động sẽ làm tăng đáng kể thời gian xử lý. Nếu thanh tiến trình bị dừng, vui lòng tham khảo hai câu hỏi thường gặp sau: https://ragflow.io/docs/dev/faq#why-does-my-document-parsing-stall-at-under-one-percent.',
+      parsingStatusTip:
+        'Thời gian xử lý tài liệu thay đổi tùy theo nhiều yếu tố. Bật các tính năng như Knowledge Graph, RAPTOR, Trích xuất Câu hỏi Tự động hoặc Trích xuất Từ khóa Tự động sẽ làm tăng đáng kể thời gian xử lý. Nếu thanh tiến trình bị dừng, vui lòng tham khảo hai câu hỏi thường gặp sau: https://ragflow.io/docs/dev/faq#why-does-my-document-parsing-stall-at-under-one-percent.',
       processBeginAt: 'Bắt đầu xử lý lúc',
       processDuration: 'Thời gian xử lý',
       progressMsg: 'Thông báo tiến trình',
@@ -143,7 +144,7 @@ export default {
       toMessage: 'Thiếu số trang kết thúc (được loại trừ)',
       layoutRecognize: 'Nhận dạng bố cục',
       layoutRecognizeTip:
-        'Sử dụng các mô hình trực quan để phân tích bố cục nhằm xác định tốt hơn cấu trúc tài liệu, tìm vị trí của tiêu đề, khối văn bản, hình ảnh và bảng. Nếu không có tính năng này, chỉ có thể lấy được văn bản thuần của PDF.',
+        'Sử dụng các mô hình trực quan để phân tích bố cục nhằm xác định tốt hơn cấu trúc tài liệu, tìm vị trí của tiêu đề, khối văn bản, hình ảnh và bảng. Nếu không có tính năng này, chỉ có thể lấy được văn bản thuần của PDF. Để biết thêm thông tin, hãy xem https://ragflow.io/docs/dev/select_pdf_parser.',
       taskPageSize: 'Kích thước trang tác vụ',
       taskPageSizeMessage: 'Vui lòng nhập kích thước trang tác vụ của bạn!',
       taskPageSizeTip: `Nếu sử dụng nhận dạng bố cục, tệp PDF sẽ được chia thành các nhóm trang liên tiếp. Phân tích bố cục sẽ được thực hiện song song giữa các nhóm để tăng tốc độ xử lý. 'Kích thước trang tác vụ' xác định kích thước của các nhóm. Kích thước trang càng lớn, khả năng chia tách văn bản liên tục giữa các trang thành các khối khác nhau càng thấp.`,
@@ -160,16 +161,16 @@ export default {
       cancel: 'Hủy bỏ',
       rerankModel: 'Mô hình xếp hạng lại',
       rerankPlaceholder: 'Vui lòng chọn',
-      rerankTip: `Nếu để trống, RAGFlow sẽ sử dụng kết hợp giữa độ tương đồng từ khóa được trọng số và độ tương đồng vectơ cosin được trọng số; nếu chọn mô hình xếp hạng lại, điểm xếp hạng được tính lại sẽ thay thế độ tương đồng vectơ cosin được trọng số.`,
+      rerankTip: `Tùy chọn. Nếu để trống, RAGFlow sẽ sử dụng kết hợp giữa độ tương đồng từ khóa có trọng số và độ tương đồng cosine vector có trọng số; nếu chọn mô hình rerank, điểm rerank có trọng số sẽ thay thế độ tương đồng cosine vector có trọng số. Xin lưu ý rằng việc sử dụng mô hình rerank sẽ làm tăng đáng kể thời gian phản hồi của hệ thống. Nếu bạn muốn sử dụng mô hình rerank, hãy đảm bảo sử dụng SaaS reranker; nếu bạn muốn sử dụng mô hình rerank triển khai cục bộ, hãy khởi động RAGFlow bằng docker-compose-gpu.yml.`,
       topK: 'Top-K',
       topKTip: `Sử dụng cùng với Rerank model, thiết lập này xác định số lượng đoạn văn cần gửi đến mô hình reranking được chỉ định.`,
       delimiter: 'Dấu phân cách cho phân đoạn văn bản',
       html4excel: 'Excel sang HTML',
-      html4excelTip: `Sử dụng cùng với phương pháp cắt khúc General. Khi chưa được bật, tệp bảng tính (XLSX, XLS (Excel97~2003)) sẽ được phân tích theo dòng thành các cặp khóa-giá trị. Khi bật, tệp bảng tính sẽ được phân tích thành bảng HTML. Nếu bảng gốc vượt quá 12 dòng, hệ thống sẽ tự động chia thành nhiều bảng HTML mỗi 12 dòng.`,
+      html4excelTip: `Sử dụng cùng với phương pháp cắt khúc General. Khi chưa được bật, tệp bảng tính (XLSX, XLS (Excel 97-2003)) sẽ được phân tích theo dòng thành các cặp khóa-giá trị. Khi bật, tệp bảng tính sẽ được phân tích thành bảng HTML. Nếu bảng gốc vượt quá 12 dòng, hệ thống sẽ tự động chia thành nhiều bảng HTML mỗi 12 dòng. Để biết thêm thông tin, vui lòng xem https://ragflow.io/docs/dev/enable_excel2html.`,
       autoKeywords: 'Từ khóa tự động',
-      autoKeywordsTip: `Tự động trích xuất N từ khóa cho mỗi khối để tăng thứ hạng của chúng trong các truy vấn chứa các từ khóa đó. Lưu ý rằng các token bổ sung sẽ được tiêu thụ bởi mô hình trò chuyện được chỉ định trong "Cài đặt mô hình hệ thống". Bạn có thể kiểm tra hoặc cập nhật các từ khóa đã thêm cho một khối từ danh sách khối.`,
+      autoKeywordsTip: `Tự động trích xuất N từ khóa cho mỗi khối để tăng thứ hạng của chúng trong các truy vấn chứa các từ khóa đó. Lưu ý rằng các token bổ sung sẽ được tiêu thụ bởi mô hình trò chuyện được chỉ định trong "Cài đặt mô hình hệ thống". Bạn có thể kiểm tra hoặc cập nhật các từ khóa đã thêm cho một khối từ danh sách khối. Để biết chi tiết, vui lòng xem https://ragflow.io/docs/dev/autokeyword_autoquestion.`,
       autoQuestions: 'Câu hỏi tự động',
-      autoQuestionsTip: `Để tăng điểm xếp hạng, hãy trích xuất N câu hỏi cho mỗi đoạn kiến thức bằng mô hình trò chuyện được xác định trong "Cài đặt mô hình hệ thống". Lưu ý rằng việc này sẽ tiêu tốn thêm token. Kết quả có thể được xem và chỉnh sửa trong danh sách các đoạn. Lỗi trích xuất câu hỏi sẽ không chặn quá trình phân đoạn; kết quả trống sẽ được thêm vào đoạn gốc.`,
+      autoQuestionsTip: `Để tăng điểm xếp hạng, hãy trích xuất N câu hỏi cho mỗi đoạn kiến thức bằng mô hình trò chuyện được xác định trong "Cài đặt mô hình hệ thống". Lưu ý rằng việc này sẽ tiêu tốn thêm token. Kết quả có thể được xem và chỉnh sửa trong danh sách các đoạn. Lỗi trích xuất câu hỏi sẽ không chặn quá trình phân đoạn; kết quả trống sẽ được thêm vào đoạn gốc. Để biết chi tiết, vui lòng xem https://ragflow.io/docs/dev/autokeyword_autoquestion.`,
       delimiterTip: `Hỗ trợ nhiều ký tự phân cách, và các ký tự phân cách nhiều ký tự được bao bọc bởi dấu . Ví dụ: nếu được cấu hình như thế này: "##"; thì văn bản sẽ được phân tách bởi dấu xuống dòng, hai dấu # và dấu chấm phẩy, sau đó được lắp ráp theo kích thước của "số token". Thiết lập các dấu phân cách chỉ sau khi hiểu cơ chế phân đoạn và phân khối văn bản.`,
       redo: `Bạn có muốn xóa các đoạn {{chunkNum}} hiện có không?`,
       knowledgeGraph: 'Đồ thị tri thức',
@@ -213,7 +214,7 @@ export default {
       methodTitle: 'Mô tả phương thức phân khối',
       methodExamples: 'Ví dụ',
       methodExamplesDescription:
-        'Các ảnh chụp màn hình sau được cung cấp để minh họa.',
+        'Để giúp bạn hiểu rõ hơn, chúng tôi đã cung cấp ảnh chụp màn hình liên quan để tham khảo.',
       dialogueExamplesTitle: 'Ví dụ hội thoại',
       methodEmpty: 'Mô tả bằng hình ảnh các danh mục cơ sở kiến thức',
       book: `<p>Các định dạng tệp được hỗ trợ là <b>DOCX</b>, <b>PDF</b>, <b>TXT</b>.</p><p>
@@ -230,7 +231,7 @@ export default {
       <p>
       <li>Sử dụng mô hình nhận dạng thị giác để chia các văn bản thành các phân đoạn nhỏ hơn.</li>
       <li>Sau đó, kết hợp các phân đoạn liền kề cho đến khi số lượng token vượt quá ngưỡng được chỉ định bởi 'Số token khối', tại thời điểm đó, một khối được tạo.</li></p>
-      <p>Các định dạng tệp được hỗ trợ là <b>DOCX, XLSX, XLS (Excel97~2003), PPT, PDF, TXT, JPEG, JPG, PNG, TIF, GIF, CSV, JSON, EML, HTML</b>.</p>`,
+      <p>Các định dạng tệp được hỗ trợ là <b>MD, MDX, DOCX, XLSX, XLS (Excel 97-2003), PPT, PDF, TXT, JPEG, JPG, PNG, TIF, GIF, CSV, JSON, EML, HTML</b>.</p>`,
       paper: `<p>Chỉ hỗ trợ tệp <b>PDF</b>.</p><p>
       Bài báo sẽ được chia theo các phần, chẳng hạn như <i>tóm tắt, 1.1, 1.2</i>. </p><p>
       Cách tiếp cận này cho phép LLM tóm tắt bài báo hiệu quả hơn và cung cấp các phản hồi toàn diện, dễ hiểu hơn. 
@@ -307,7 +308,8 @@ export default {
       maxTokenTip: 'Số lượng token tối đa cho mỗi đoạn tóm tắt được tạo ra.',
       maxTokenMessage: 'Số token tối đa là bắt buộc',
       threshold: 'Ngưỡng',
-      thresholdTip: 'Trong RAPTOR, các đoạn văn bản được nhóm lại dựa trên sự tương đồng ngữ nghĩa của chúng. Tham số Ngưỡng thiết lập mức độ tương đồng tối thiểu cần thiết để các đoạn được nhóm lại với nhau. Ngưỡng càng cao thì mỗi nhóm sẽ có ít đoạn hơn, còn ngưỡng càng thấp thì mỗi nhóm sẽ có nhiều đoạn hơn.',
+      thresholdTip:
+        'Trong RAPTOR, các đoạn văn bản được nhóm lại dựa trên sự tương đồng ngữ nghĩa của chúng. Tham số Ngưỡng thiết lập mức độ tương đồng tối thiểu cần thiết để các đoạn được nhóm lại với nhau. Ngưỡng càng cao thì mỗi nhóm sẽ có ít đoạn hơn, còn ngưỡng càng thấp thì mỗi nhóm sẽ có nhiều đoạn hơn.',
       thresholdMessage: 'Ngưỡng là bắt buộc',
       maxCluster: 'Cụm tối đa',
       maxClusterTip: 'Số lượng cụm tối đa được tạo ra.',
@@ -397,7 +399,8 @@ export default {
       setAnOpenerTip: 'Bạn muốn chào đón khách hàng của mình như thế nào?',
       knowledgeBases: 'Cơ sở kiến thức',
       knowledgeBasesMessage: 'Vui lòng chọn',
-      knowledgeBasesTip: 'Chọn các cơ sở kiến thức liên kết. Cơ sở tri thức trống sẽ không xuất hiện trong danh sách thả xuống.',
+      knowledgeBasesTip:
+        'Chọn các cơ sở kiến thức liên kết. Cơ sở tri thức trống sẽ không xuất hiện trong danh sách thả xuống.',
       system: 'Hệ thống',
       systemInitialValue: `Bạn là một trợ lý thông minh. Vui lòng tóm tắt nội dung của cơ sở kiến thức để trả lời câu hỏi. Vui lòng liệt kê dữ liệu trong cơ sở kiến thức và trả lời chi tiết. Khi tất cả nội dung cơ sở kiến thức không liên quan đến câu hỏi, câu trả lời của bạn phải bao gồm câu "Câu trả lời bạn đang tìm kiếm không được tìm thấy trong cơ sở kiến thức!" Câu trả lời cần xem xét lịch sử trò chuyện.
       Đây là cơ sở kiến thức:
@@ -405,7 +408,7 @@ export default {
       Trên đây là cơ sở kiến thức.`,
       systemMessage: 'Vui lòng nhập!',
       systemTip:
-        'Hướng dẫn bạn cần LLM để làm theo khi LLM trả lời câu hỏi, chẳng hạn như thiết kế nhân vật, độ dài câu trả lời và ngôn ngữ trả lời, v.v.',
+        'Hướng dẫn bạn cần LLM để làm theo khi LLM trả lời câu hỏi, chẳng hạn như thiết kế nhân vật, độ dài câu trả lời và ngôn ngữ trả lời, v.v. Nếu mô hình của bạn hỗ trợ suy luận nguyên bản, bạn có thể thêm //no_thinking vào prompt để dừng suy luận.',
       topN: 'Top N',
       topNTip: `Không phải tất cả các khối có điểm tương đồng vượt quá 'ngưỡng tương đồng' sẽ được cung cấp cho LLMs. LLM chỉ có thể xem 'Top N' khối này.`,
       variable: 'Biến',
@@ -502,6 +505,7 @@ export default {
     },
     setting: {
       profile: 'Hồ sơ',
+      avatar: 'Avatar',
       profileDescription: 'Cập nhật ảnh và thông tin cá nhân của bạn tại đây.',
       maxTokens: 'Token tối đa',
       maxTokensMessage: 'Token tối đa là bắt buộc',
@@ -1153,6 +1157,7 @@ export default {
       promptTip:
         'Sử dụng lời nhắc hệ thống để mô tả nhiệm vụ cho LLM, chỉ định cách nó nên phản hồi và phác thảo các yêu cầu khác nhau. Lời nhắc hệ thống thường được sử dụng kết hợp với các khóa (biến), đóng vai trò là các đầu vào dữ liệu khác nhau cho LLM. Sử dụng dấu gạch chéo `/` hoặc nút (x) để hiển thị các khóa cần sử dụng.',
       promptMessage: 'Nhắc nhở là bắt buộc',
+      runningHintText: 'đang chạy...🕞',
     },
     footer: {
       profile: 'All rights reserved @ React',

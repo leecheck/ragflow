@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 4
 slug: /http_api_reference
 ---
 
@@ -343,7 +343,6 @@ Creates a dataset.
   - `"embedding_model"`: `string`
   - `"permission"`: `string`
   - `"chunk_method"`: `string`
-  - `"pagerank"`: `int`
   - `"parser_config"`: `object`
 
 ##### Request example
@@ -383,12 +382,6 @@ curl --request POST \
   Specifies who can access the dataset to create. Available options:  
   - `"me"`: (Default) Only you can manage the dataset.
   - `"team"`: All team members can manage the dataset.
-
-- `"pagerank"`: (*Body parameter*), `int`  
-  refer to [Set page rank](https://ragflow.io/docs/dev/set_page_rank)
-  - Default: `0`
-  - Minimum: `0`
-  - Maximum: `100`
 
 - `"chunk_method"`: (*Body parameter*), `enum<string>`  
   The chunking method of the dataset to create. Available options:  
@@ -507,7 +500,7 @@ Deletes datasets by ID.
   - `'content-Type: application/json'`
   - `'Authorization: Bearer <YOUR_API_KEY>'`
   - Body:
-    - `"ids"`: `list[string]`
+    - `"ids"`: `list[string]` or `null`
 
 ##### Request example
 
@@ -517,14 +510,17 @@ curl --request DELETE \
      --header 'Content-Type: application/json' \
      --header 'Authorization: Bearer <YOUR_API_KEY>' \
      --data '{
-     "ids": ["test_1", "test_2"]
+     "ids": ["d94a8dc02c9711f0930f7fbc369eab6d", "e94a8dc02c9711f0930f7fbc369eab6e"]
      }'
 ```
 
 ##### Request parameters
 
-- `"ids"`: (*Body parameter*), `list[string]`  
-  The IDs of the datasets to delete. If it is not specified, all datasets will be deleted.
+- `"ids"`: (*Body parameter*), `list[string]` or `null`,   *Required*  
+  Specifies the datasets to delete:
+  - If `null`, all datasets will be deleted.
+  - If an array of IDs, only the specified datasets will be deleted.
+  - If an empty array, no datasets will be deleted.
 
 #### Response
 
@@ -897,7 +893,7 @@ curl --request PUT \
 - `document_id`: (*Path parameter*)  
   The ID of the document to update.
 - `"name"`: (*Body parameter*), `string`
-- `"meta_fields"`: (*Body parameter*)， `dict[str, Any]` The meta fields of the document.
+- `"meta_fields"`: (*Body parameter*), `dict[str, Any]` The meta fields of the document.
 - `"chunk_method"`: (*Body parameter*), `string`  
   The parsing method to apply to the document:  
   - `"naive"`: General
@@ -2139,7 +2135,7 @@ Success:
         "id": "4606b4ec87ad11efbc4f0242ac120006",
         "messages": [
             {
-                "content": "Hi! I am your assistant，can I help you?",
+                "content": "Hi! I am your assistant, can I help you?",
                 "role": "assistant"
             }
         ],
@@ -2280,7 +2276,7 @@ Success:
             "id": "578d541e87ad11ef96b90242ac120006",
             "messages": [
                 {
-                    "content": "Hi! I am your assistant，can I help you?",
+                    "content": "Hi! I am your assistant, can I help you?",
                     "role": "assistant"
                 }
             ],
@@ -3224,22 +3220,24 @@ Failure:
 
 ---
 
-### Related Questions
+### Generate related questions
 
-**POST** `/v1/conversation/related_questions`
+**POST** `/v1/sessions/related_questions`
 
 Generates five to ten alternative question strings from the user's original query to retrieve more relevant search results.
 
-This operation requires a `Bearer Login Token`, typically expires with in 24 hours. You can find the it in the browser request easily.
+This operation requires a `Bearer Login Token`, which typically expires with in 24 hours. You can find the it in the Request Headers in your browser easily as shown below:
+
+![Image](https://github.com/user-attachments/assets/17a5a0fe-e411-4e35-8251-85c71444468b)
 
 :::tip NOTE
-The chat model dynamically determines the number of questions to generate based on the instruction, typically between five and ten.
+The chat model autonomously determines the number of questions to generate based on the instruction, typically between five and ten.
 :::
 
 #### Request
 
 - Method: POST
-- URL: `/v1/conversation/related_questions`
+- URL: `/v1/sessions/related_questions`
 - Headers:
   - `'content-Type: application/json'`
   - `'Authorization: Bearer <YOUR_LOGIN_TOKEN>'`
@@ -3250,7 +3248,7 @@ The chat model dynamically determines the number of questions to generate based 
 
 ```bash
 curl --request POST \
-     --url http://{address}/v1/conversation/related_questions \
+     --url http://{address}/v1/sessions/related_questions \
      --header 'Content-Type: application/json' \
      --header 'Authorization: Bearer <YOUR_LOGIN_TOKEN>' \
      --data '
@@ -3413,3 +3411,190 @@ Failure:
 
 ---
 
+### Create agent
+
+**POST** `/api/v1/agents`
+
+Create an agent.
+
+#### Request
+
+- Method: POST
+- URL: `/api/v1/agents`
+- Headers:
+  - `'Content-Type: application/json`
+  - `'Authorization: Bearer <YOUR_API_KEY>'`
+- Body:
+  - `"title"`: `string`
+  - `"description"`: `string`
+  - `"dsl"`: `object`
+
+##### Request example
+
+```bash
+curl --request POST \
+     --url http://{address}/api/v1/agents \
+     --header 'Content-Type: application/json' \
+     --header 'Authorization: Bearer <YOUR_API_KEY>' \
+     --data '{
+         "title": "Test Agent",
+         "description": "A test agent",
+         "dsl": {
+           // ... Canvas DSL here ...
+         }
+     }'
+```
+
+##### Request parameters
+
+- `title`: (*Body parameter*), `string`, *Required*  
+  The title of the agent.
+- `description`: (*Body parameter*), `string`  
+  The description of the agent. Defaults to `None`.
+- `dsl`: (*Body parameter*), `object`, *Required*  
+  The canvas DSL object of the agent.
+
+#### Response
+
+Success:
+
+```json
+{
+    "code": 0,
+    "data": true,
+    "message": "success"
+}
+```
+
+Failure:
+
+```json
+{
+    "code": 102,
+    "message": "Agent with title test already exists."
+}
+```
+
+---
+
+### Update agent
+
+**PUT** `/api/v1/agents/{agent_id}`
+
+Update an agent by id.
+
+#### Request
+
+- Method: PUT
+- URL: `/api/v1/agents/{agent_id}`
+- Headers:
+  - `'Content-Type: application/json`
+  - `'Authorization: Bearer <YOUR_API_KEY>'`
+- Body:
+  - `"title"`: `string`
+  - `"description"`: `string`
+  - `"dsl"`: `object`
+
+##### Request example
+
+```bash
+curl --request PUT \
+     --url http://{address}/api/v1/agents/58af890a2a8911f0a71a11b922ed82d6 \
+     --header 'Content-Type: application/json' \
+     --header 'Authorization: Bearer <YOUR_API_KEY>' \
+     --data '{
+         "title": "Test Agent",
+         "description": "A test agent",
+         "dsl": {
+           // ... Canvas DSL here ...
+         }
+     }'
+```
+
+##### Request parameters
+
+- `agent_id`: (*Path parameter*), `string`  
+  The id of the agent to be updated.
+- `title`: (*Body parameter*), `string`  
+  The title of the agent.
+- `description`: (*Body parameter*), `string`  
+  The description of the agent.
+- `dsl`: (*Body parameter*), `object`  
+  The canvas DSL object of the agent.
+
+Only specify the parameter you want to change in the request body. If a parameter does not exist or is `None`, it won't be updated.
+
+#### Response
+
+Success:
+
+```json
+{
+    "code": 0,
+    "data": true,
+    "message": "success"
+}
+```
+
+Failure:
+
+```json
+{
+    "code": 103,
+    "message": "Only owner of canvas authorized for this operation."
+}
+```
+
+---
+
+### Delete agent
+
+**DELETE** `/api/v1/agents/{agent_id}`
+
+Delete an agent by id.
+
+#### Request
+
+- Method: DELETE
+- URL: `/api/v1/agents/{agent_id}`
+- Headers:
+  - `'Content-Type: application/json`
+  - `'Authorization: Bearer <YOUR_API_KEY>'`
+
+##### Request example
+
+```bash
+curl --request DELETE \
+     --url http://{address}/api/v1/agents/58af890a2a8911f0a71a11b922ed82d6 \
+     --header 'Content-Type: application/json' \
+     --header 'Authorization: Bearer <YOUR_API_KEY>' \
+     --data '{}'
+```
+
+##### Request parameters
+
+- `agent_id`: (*Path parameter*), `string`  
+  The id of the agent to be deleted.
+
+#### Response
+
+Success:
+
+```json
+{
+    "code": 0,
+    "data": true,
+    "message": "success"
+}
+```
+
+Failure:
+
+```json
+{
+    "code": 103,
+    "message": "Only owner of canvas authorized for this operation."
+}
+```
+
+---

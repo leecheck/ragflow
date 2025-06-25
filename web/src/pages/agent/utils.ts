@@ -1,9 +1,9 @@
 import {
-  DSLComponents,
+  IAgentForm,
   ICategorizeItem,
   ICategorizeItemResult,
-  RAGFlowNodeType,
-} from '@/interfaces/database/flow';
+} from '@/interfaces/database/agent';
+import { DSLComponents, RAGFlowNodeType } from '@/interfaces/database/flow';
 import { removeUselessFieldsFromValues } from '@/utils/form';
 import { Edge, Node, Position, XYPosition } from '@xyflow/react';
 import { FormInstance, FormListFieldData } from 'antd';
@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   CategorizeAnchorPointPositions,
   NoDebugOperatorsList,
+  NodeHandleId,
   NodeMap,
   Operator,
 } from './constant';
@@ -94,9 +95,28 @@ const buildComponentDownstreamOrUpstream = (
   edges: Edge[],
   nodeId: string,
   isBuildDownstream = true,
+  nodes: Node[],
 ) => {
   return edges
-    .filter((y) => y[isBuildDownstream ? 'source' : 'target'] === nodeId)
+    .filter((y) => {
+      const node = nodes.find((x) => x.id === nodeId);
+      let isNotUpstreamTool = true;
+      let isNotUpstreamAgent = true;
+      if (isBuildDownstream && node?.data.label === Operator.Agent) {
+        // Exclude the tool operator downstream of the agent operator
+        isNotUpstreamTool = !y.target.startsWith(Operator.Tool);
+        // Exclude the agent operator downstream of the agent operator
+        isNotUpstreamAgent = !(
+          y.target.startsWith(Operator.Agent) &&
+          y.targetHandle === NodeHandleId.AgentTop
+        );
+      }
+      return (
+        y[isBuildDownstream ? 'source' : 'target'] === nodeId &&
+        isNotUpstreamTool &&
+        isNotUpstreamAgent
+      );
+    })
     .map((y) => y[isBuildDownstream ? 'target' : 'source']);
 };
 
@@ -119,11 +139,39 @@ const removeUselessDataInTheOperator = curry(
 //   return values;
 // });
 
+function buildAgentTools(edges: Edge[], nodes: Node[], nodeId: string) {
+  const node = nodes.find((x) => x.id === nodeId);
+  const params = { ...(node?.data.form ?? {}) };
+  if (node && node.data.label === Operator.Agent) {
+    const bottomSubAgentEdges = edges.filter(
+      (x) => x.source === nodeId && x.sourceHandle === NodeHandleId.AgentBottom,
+    );
+
+    (params as IAgentForm).tools = (params as IAgentForm).tools.concat(
+      bottomSubAgentEdges.map((x) => {
+        const formData = buildAgentTools(edges, nodes, x.target);
+
+        return { component_name: Operator.Agent, params: { ...formData } };
+      }),
+    );
+  }
+  return params;
+}
+
 const buildOperatorParams = (operatorName: string) =>
   pipe(
     removeUselessDataInTheOperator(operatorName),
     // initializeOperatorParams(operatorName), // Final processing, for guarantee
   );
+
+const ExcludeOperators = [Operator.Note, Operator.Tool];
+
+export function isBottomSubAgent(edges: Edge[], nodeId?: string) {
+  const edge = edges.find(
+    (x) => x.target === nodeId && x.targetHandle === NodeHandleId.AgentTop,
+  );
+  return !!edge;
+}
 
 // construct a dsl based on the node information of the graph
 export const buildDslComponentsByGraph = (
@@ -134,21 +182,24 @@ export const buildDslComponentsByGraph = (
   const components: DSLComponents = {};
 
   nodes
-    ?.filter((x) => x.data.label !== Operator.Note)
+    ?.filter(
+      (x) =>
+        !ExcludeOperators.some((y) => y === x.data.label) &&
+        !isBottomSubAgent(edges, x.id),
+    )
     .forEach((x) => {
       const id = x.id;
       const operatorName = x.data.label;
+
+      const params = buildAgentTools(edges, nodes, id);
       components[id] = {
         obj: {
           ...(oldDslComponents[id]?.obj ?? {}),
           component_name: operatorName,
-          params:
-            buildOperatorParams(operatorName)(
-              x.data.form as Record<string, unknown>,
-            ) ?? {},
+          params: buildOperatorParams(operatorName)(params) ?? {},
         },
-        downstream: buildComponentDownstreamOrUpstream(edges, id, true),
-        upstream: buildComponentDownstreamOrUpstream(edges, id, false),
+        downstream: buildComponentDownstreamOrUpstream(edges, id, true, nodes),
+        upstream: buildComponentDownstreamOrUpstream(edges, id, false, nodes),
         parent_id: x?.parentId,
       };
     });
@@ -391,6 +442,22 @@ export const generateDuplicateNode = (
   };
 };
 
+export function convertToStringArray(
+  list?: Array<{ value: string | number | boolean }>,
+) {
+  if (!Array.isArray(list)) {
+    return [];
+  }
+  return list.map((x) => x.value);
+}
+
+export function convertToObjectArray(list: Array<string | number | boolean>) {
+  if (!Array.isArray(list)) {
+    return [];
+  }
+  return list.map((x) => ({ value: x }));
+}
+
 /**
    * convert the following object into a list
    * 
@@ -411,7 +478,11 @@ export const buildCategorizeListFromObject = (
     .reduce<Array<ICategorizeItem>>((pre, cur) => {
       // synchronize edge data to the to field
 
-      pre.push({ name: cur, ...categorizeItem[cur] });
+      pre.push({
+        name: cur,
+        ...categorizeItem[cur],
+        examples: convertToObjectArray(categorizeItem[cur].examples),
+      });
       return pre;
     }, [])
     .sort((a, b) => a.index - b.index);
@@ -424,7 +495,7 @@ export const buildCategorizeListFromObject = (
       {
         "name": "Categorize 1",
         "description": "111",
-        "examples": "ddd",
+        "examples": ["ddd"],
         "to": "Retrieval:LazyEelsStick"
       }
      ]
@@ -433,8 +504,36 @@ export const buildCategorizeListFromObject = (
 export const buildCategorizeObjectFromList = (list: Array<ICategorizeItem>) => {
   return list.reduce<ICategorizeItemResult>((pre, cur) => {
     if (cur?.name) {
-      pre[cur.name] = omit(cur, 'name');
+      pre[cur.name] = {
+        ...omit(cur, 'name', 'examples'),
+        examples: convertToStringArray(cur.examples),
+      };
     }
     return pre;
   }, {});
 };
+
+export function getAgentNodeTools(agentNode?: RAGFlowNodeType) {
+  const tools: IAgentForm['tools'] = get(agentNode, 'data.form.tools', []);
+  return tools;
+}
+
+export function mapEdgeMouseEvent(
+  edges: Edge[],
+  edgeId: string,
+  isHovered: boolean,
+) {
+  const nextEdges = edges.map((element) =>
+    element.id === edgeId
+      ? {
+          ...element,
+          data: {
+            ...element.data,
+            isHovered,
+          },
+        }
+      : element,
+  );
+
+  return nextEdges;
+}
